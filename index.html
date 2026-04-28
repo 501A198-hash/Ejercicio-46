@@ -9,13 +9,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@ivine/osmd-audio-player@1.7.0/dist/browser/osmd-audio-player.min.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: inline-block; width: 90%; max-width: 800px; }
-        button { background-color: #28a745; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.2s; }
-        button:hover { background-color: #218838; transform: translateY(-2px); }
-        #score-container { background: white; margin-top: 30px; border-radius: 10px; min-height: 400px; }
-        .controls { margin: 20px 0; }
-        input[type=range] { width: 250px; margin: 0 15px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 900px; }
+        .controls { margin: 20px 0; padding: 15px; background: #fafafa; border-radius: 15px; }
+        button { background-color: #28a745; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        button:hover { background-color: #218838; }
+        #score-container { background: white; margin-top: 20px; min-height: 300px; }
+        input[type=range] { width: 200px; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -25,34 +25,40 @@
         
         <div class="controls">
             <button id="btn-play">▶ REPRODUCIR / PAUSA</button>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 15px;">
                 <label>Tempo: </label>
                 <input type="range" id="tempo-slider" min="30" max="160" value="100">
                 <span id="tempo-val">100 BPM</span>
             </div>
         </div>
 
-        <div id="score-container"></div>
+        <div id="score-container">Cargando partitura...</div>
     </div>
 
     <script>
-        // Esperamos a que la ventana cargue totalmente
-        window.onload = async function() {
+        // Esta función espera a que las librerías externas carguen bien
+        async function startApp() {
+            if (typeof OsmdAudioPlayer === 'undefined') {
+                console.error("La librería de audio no cargó. Reintentando...");
+                setTimeout(startApp, 1000);
+                return;
+            }
+
             const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("score-container");
             const audioPlayer = new OsmdAudioPlayer();
 
             try {
-                // IMPORTANTE: Verifica que el nombre sea exactamente este
+                // El nombre del archivo debe ser EXACTO al que subiste
                 await osmd.load("ejercicio46.xml"); 
                 osmd.render();
                 await audioPlayer.loadScore(osmd);
-                console.log("Partitura cargada con éxito");
+                document.getElementById("score-container").style.minHeight = "auto";
+                console.log("¡Todo listo!");
             } catch (e) {
-                console.error("Error al cargar el archivo XML:", e);
-                document.getElementById("score-container").innerHTML = "<p style='color:red;'>Error: No se encontró el archivo ejercicio46.xml o el formato es incorrecto.</p>";
+                document.getElementById("score-container").innerHTML = 
+                    "<p style='color:red;'>Error: No se pudo cargar 'ejercicio46.xml'. Verifica el nombre del archivo.</p>";
             }
 
-            // Lógica de botones
             document.getElementById("btn-play").onclick = () => {
                 if (audioPlayer.state === "STOPPED" || audioPlayer.state === "PAUSED") {
                     audioPlayer.play();
@@ -66,7 +72,9 @@
                 document.getElementById("tempo-val").innerText = bpm + " BPM";
                 audioPlayer.setTempo(bpm);
             };
-        };
+        }
+
+        window.onload = startApp;
     </script>
 </body>
 </html>
