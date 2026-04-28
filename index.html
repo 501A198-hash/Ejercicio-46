@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor Interactivo - Wüllner 46</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.7/build/opensheetmusicdisplay.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ivine/osmd-audio-player@1.7.0/dist/browser/osmd-audio-player.min.js"></script>
+
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; color: #333; text-align: center; padding: 20px; }
+        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; margin-bottom: 20px; }
+        button { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #45a049; }
+        #score-container { background: white; padding: 10px; border-radius: 8px; min-height: 400px; }
+        .tempo-control { margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <h1>Ejercicio de Solfeo - Wüllner 46</h1>
+
+    <div class="controls">
+        <button id="btn-play">Reproducir / Pausa</button>
+        <div class="tempo-control">
+            <label for="tempo-slider">Tempo: </label>
+            <input type="range" id="tempo-slider" min="30" max="200" value="100">
+            <span id="tempo-val">100 BPM</span>
+        </div>
+    </div>
+
+    <div id="score-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
