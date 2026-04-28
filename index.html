@@ -3,36 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor Interactivo - Wüllner 46</title>
+    <title>Reproductor Wüllner 46</title>
     
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.7/build/opensheetmusicdisplay.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ivine/osmd-audio-player@1.7.0/dist/browser/osmd-audio-player.min.js"></script>
 
     <style>
-        body { font-family: sans-serif; background-color: #f4f7f6; color: #333; text-align: center; padding: 20px; }
-        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; margin-bottom: 20px; }
-        button { background-color: #4CAF50; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background-color: #45a049; transform: scale(1.05); }
-        #score-container { background: white; padding: 15px; border-radius: 8px; min-height: 400px; margin-top: 20px; }
-        .tempo-control { margin-top: 15px; }
-        input[type=range] { width: 200px; cursor: pointer; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: inline-block; width: 90%; max-width: 800px; }
+        button { background-color: #28a745; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.2s; }
+        button:hover { background-color: #218838; transform: translateY(-2px); }
+        #score-container { background: white; margin-top: 30px; border-radius: 10px; min-height: 400px; }
+        .controls { margin: 20px 0; }
+        input[type=range] { width: 250px; margin: 0 15px; }
     </style>
 </head>
 <body>
 
-    <h1>Ejercicio de Solfeo - Wüllner 46</h1>
-
-    <div class="controls">
-        <button id="btn-play">▶ Reproducir / Pausa</button>
-        <div class="tempo-control">
-            <label for="tempo-slider">Tempo: </label>
-            <input type="range" id="tempo-slider" min="30" max="180" value="100">
-            <span id="tempo-val">100 BPM</span>
+    <div class="card">
+        <h1>Lectura Musical I - Ejercicio 46</h1>
+        
+        <div class="controls">
+            <button id="btn-play">▶ REPRODUCIR / PAUSA</button>
+            <div style="margin-top: 20px;">
+                <label>Tempo: </label>
+                <input type="range" id="tempo-slider" min="30" max="160" value="100">
+                <span id="tempo-val">100 BPM</span>
+            </div>
         </div>
+
+        <div id="score-container"></div>
     </div>
 
-    <div id="score-container"></div>
+    <script>
+        // Esperamos a que la ventana cargue totalmente
+        window.onload = async function() {
+            const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("score-container");
+            const audioPlayer = new OsmdAudioPlayer();
 
-    <script src="script.js"></script>
+            try {
+                // IMPORTANTE: Verifica que el nombre sea exactamente este
+                await osmd.load("ejercicio46.xml"); 
+                osmd.render();
+                await audioPlayer.loadScore(osmd);
+                console.log("Partitura cargada con éxito");
+            } catch (e) {
+                console.error("Error al cargar el archivo XML:", e);
+                document.getElementById("score-container").innerHTML = "<p style='color:red;'>Error: No se encontró el archivo ejercicio46.xml o el formato es incorrecto.</p>";
+            }
+
+            // Lógica de botones
+            document.getElementById("btn-play").onclick = () => {
+                if (audioPlayer.state === "STOPPED" || audioPlayer.state === "PAUSED") {
+                    audioPlayer.play();
+                } else {
+                    audioPlayer.pause();
+                }
+            };
+
+            document.getElementById("tempo-slider").oninput = (e) => {
+                const bpm = e.target.value;
+                document.getElementById("tempo-val").innerText = bpm + " BPM";
+                audioPlayer.setTempo(bpm);
+            };
+        };
+    </script>
 </body>
 </html>
