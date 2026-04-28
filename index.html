@@ -5,43 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reproductor Wüllner 46</title>
     
-    <script src="https://unpkg.com/opensheetmusicdisplay@1.8.8/build/opensheetmusicdisplay.min.js"></script>
-    <script src="https://unpkg.com/osmd-audio-player@1.1.0/dist/osmd-audio-player.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.8/build/opensheetmusicdisplay.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/osmd-audio-player@1.1.0/dist/osmd-audio-player.min.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; text-align: center; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: inline-block; width: 95%; max-width: 850px; }
-        .controls { margin-bottom: 25px; padding: 20px; background: #ffffff; border: 1px solid #eee; border-radius: 15px; }
-        button { background-color: #2ecc71; color: white; border: none; padding: 15px 35px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.3s; }
-        button:hover { background-color: #27ae60; transform: scale(1.05); }
-        #score-container { background: white; margin-top: 20px; min-height: 300px; border-radius: 10px; }
-        .tempo-box { margin-top: 15px; font-size: 1.1rem; color: #555; }
-        input[type=range] { width: 220px; cursor: pointer; margin: 0 10px; vertical-align: middle; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 850px; }
+        .controls { margin-bottom: 20px; padding: 20px; border-radius: 15px; background: #fff; border: 1px solid #eee; }
+        button { background-color: #2ecc71; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        button:hover { background-color: #27ae60; }
+        #score-container { background: white; margin-top: 20px; min-height: 200px; }
+        .error-box { color: #e74c3c; background: #fdf2f2; padding: 15px; border-radius: 10px; display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h2 style="color: #2c3e50;">Cátedra de Lectura Musical I</h2>
-        <h3 style="color: #7f8c8d;">Ejercicio 46 - Wüllner</h3>
+        <h2>Cátedra de Lectura Musical I</h2>
+        <h3>Ejercicio 46 - Wüllner</h3>
         
         <div class="controls">
             <button id="btn-play">▶ REPRODUCIR / PAUSA</button>
-            <div class="tempo-box">
-                <span>Tempo:</span>
+            <div style="margin-top: 15px;">
+                <label>Tempo:</label>
                 <input type="range" id="tempo-slider" min="30" max="160" value="100">
                 <span id="tempo-val">100 BPM</span>
             </div>
         </div>
 
+        <div id="error-display" class="error-box"></div>
         <div id="score-container">Cargando partitura...</div>
     </div>
 
     <script>
         async function init() {
-            // Verificamos si las librerías cargaron bien
-            if (typeof opensheetmusicdisplay === 'undefined' || typeof OsmdAudioPlayer === 'undefined') {
-                document.getElementById("score-container").innerHTML = "<p style='color:red;'>Error: Las librerías de música no cargaron. Por favor, refresca la página (Ctrl+F5).</p>";
+            const errorDiv = document.getElementById("error-display");
+            
+            // Verificación detallada de librerías
+            if (typeof opensheetmusicdisplay === 'undefined') {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "Error: La librería de partituras no cargó. Revisa tu conexión.";
+                return;
+            }
+            if (typeof OsmdAudioPlayer === 'undefined') {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "Error: El motor de audio no cargó. Intenta refrescar con Ctrl+F5.";
                 return;
             }
 
@@ -49,19 +57,17 @@
             const audioPlayer = new OsmdAudioPlayer();
 
             try {
-                // Cargamos tu archivo XML
+                // Nombre exacto del archivo en tu GitHub
                 await osmd.load("ejercicio46.xml"); 
                 osmd.render();
                 await audioPlayer.loadScore(osmd);
-                document.getElementById("score-container").innerHTML = ""; // Limpiamos el texto de carga
-                osmd.render(); // Volvemos a renderizar para asegurar que todo esté centrado
-                console.log("¡Carga exitosa!");
-            } catch (error) {
-                console.error(error);
-                document.getElementById("score-container").innerHTML = "<p style='color:red;'>Error al cargar 'ejercicio46.xml'. Asegúrate de que el nombre sea exacto.</p>";
+                document.getElementById("score-container").innerHTML = ""; // Limpia el mensaje de carga
+                osmd.render(); 
+            } catch (e) {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = "Error al leer 'ejercicio46.xml'. Asegúrate que el archivo esté en la carpeta principal.";
             }
 
-            // Controles de usuario
             document.getElementById("btn-play").onclick = () => {
                 if (audioPlayer.state === "STOPPED" || audioPlayer.state === "PAUSED") {
                     audioPlayer.play();
