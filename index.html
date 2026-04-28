@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reproductor Wüllner 46 - UMSS</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.7/build/opensheetmusicdisplay.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.8/build/opensheetmusicdisplay.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/osmd-audio-player@1.1.0/dist/osmd-audio-player.min.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f9; text-align: center; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 850px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; text-align: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: inline-block; width: 95%; max-width: 850px; }
         .controls { background: #ffffff; border: 1px solid #ddd; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
-        button { background-color: #27ae60; color: white; border: none; padding: 15px 35px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.2s; }
-        button:hover { background-color: #219150; transform: scale(1.02); }
-        #score-container { background: white; min-height: 350px; border-radius: 10px; margin-top: 20px; }
-        .error-msg { color: #c0392b; background: #f9ebea; padding: 15px; border-radius: 10px; display: none; margin: 15px 0; border: 1px solid #e6b0aa; }
+        button { background-color: #27ae60; color: white; border: none; padding: 15px 35px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        button:hover { background-color: #219150; }
+        #score-container { background: white; min-height: 300px; border-radius: 10px; margin-top: 20px; border: 1px solid #eee; }
+        .error-msg { color: #c0392b; background: #f9ebea; padding: 15px; border-radius: 10px; display: none; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -34,33 +34,33 @@
         </div>
 
         <div id="error-display" class="error-msg"></div>
-        <div id="score-container">Cargando motor de música...</div>
+        <div id="score-container">Cargando partitura...</div>
     </div>
 
     <script>
         async function loadMusic() {
             const errorDiv = document.getElementById("error-display");
             
-            // Verificamos si las librerías cargaron bien
+            // Verificamos carga de librerías
             if (typeof opensheetmusicdisplay === 'undefined' || typeof OsmdAudioPlayer === 'undefined') {
                 errorDiv.style.display = "block";
-                errorDiv.innerText = "Error: El motor de audio fue bloqueado por el navegador. Intenta con Ctrl+F5.";
+                errorDiv.innerText = "Error: El navegador bloqueó los archivos de música. Por favor, presiona Ctrl+F5.";
                 return;
             }
 
-            errorDiv.style.display = "none";
             const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay("score-container");
             const audioPlayer = new OsmdAudioPlayer();
 
             try {
-                // Nombre del archivo EXACTO en tu GitHub
+                // Nombre del archivo EXACTO
                 await osmd.load("ejercicio46.xml"); 
                 osmd.render();
                 await audioPlayer.loadScore(osmd);
                 document.getElementById("score-container").style.minHeight = "auto";
+                console.log("¡Listo!");
             } catch (e) {
                 errorDiv.style.display = "block";
-                errorDiv.innerText = "Error: No se pudo leer 'ejercicio46.xml'. Revisa el nombre del archivo.";
+                errorDiv.innerText = "Error: No se encontró 'ejercicio46.xml'. Revisa el nombre del archivo en GitHub.";
             }
 
             document.getElementById("btn-play").onclick = () => {
