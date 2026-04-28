@@ -3,7 +3,7 @@ const audioPlayer = new OsmdAudioPlayer();
 
 async function init() {
     // IMPORTANTE: El nombre entre comillas debe ser IGUAL al de tu archivo subido
-    await osmd.load("ejercicio46.musicxml"); 
+    await osmd.load("ejercicio46.xml"); 
     osmd.render();
     await audioPlayer.loadScore(osmd);
 }
